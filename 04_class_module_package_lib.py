@@ -437,4 +437,231 @@ AttributeError: module 'game' has no attribute 'sound'
 
 #참고) import a.b.c 형태일때, c는 반드시 모듈 or 패키지 여야 한다
 
-###__init__.py 의 용도
+###__init__.py : 해당 디렉토리가 패키지의 일부임을 알려주는역할(python3.3 이전버전)
+'''
+>>> import sys
+>>> sys.path
+>>> sys.path.append('D:\doit')
+>>> from game.sound import *
+>>> echo.echo_test()    #NameError: name 'echo' is not defined
+'''
+
+#D:\doit\game\sound\__init__.py
+__all__ = ['echo']  #sound디렉토리에서 import *을 할경우 echo 모듈을 import 한다는 의미
+    #__all__에 적힌 모듈들이 from game.sound import *을 할때 import 가능한 모듈 목록이 되는것
+
+'''
+>>> from game.sound import *
+>>> echo.echo_test()
+echo
+'''
+
+###나혼자 코딩 : *을 사용해 render.py 파일 안 render_test 함수를 사용해볼것
+#D:\doit\game\graphic\__init__.py
+__all__ = ['render']
+
+'''
+>>> import sys
+>>> sys.path
+>>> sys.path.append('D:\doit')
+
+>>> from game.graphic import *
+>>> render.render_test()
+render
+'''
+
+###relative 패키지
+#만약 graphic 디렉토리 render.py 모듈이, sound디렉토리 echo.py모듈을 사용하고 싶다면?
+    #render.py에 아래의 코드 삽입
+    
+#render.py
+from game.sound.echo import echo_test
+def render_test():
+    print('render')
+    echo_test()
+    
+'''경로 잡아두고
+>>> import sys
+>>> sys.path.append('D:\doit')
+
+>>> from game.graphic.render import render_test
+>>> render_test()
+render
+echo
+'''
+
+#위 처럼 정석적인 루트의 import도 가능하나, 아래처럼 relative import도 가능
+    #단, relative import사용하려면 경로관계를 구체적으로 파악하고 있어야함
+        #또한, 인터프리터 공간에서는 사용이 불가능하며
+            #.py같이 모듈(작업페이지) 공간에서만 사용 가능하다
+#render.py
+from ..sound.echo import echo_test
+
+def render_test():
+    print('render')
+    echo_test()
+    
+'''
+>>> import sys
+>>> sys.path.append('D:\doit')
+>>> from game.graphic.render import render_test
+>>> render_test()
+render
+echo    #정상작동 확인
+'''
+#인터프리터에서 relative import 사용시 에러출력(SystemError: cannot perform relative import)
+
+#####5-4 예외처리
+'''오류 종류
+1. f = open('없는파일', 'r')
+FileNotFoundError: [Errno 2] No such file or directory: '없는파일' #없는파일 열기시도
+
+2. 4/0
+ZeroDivisionError: division by zero #4는 0으로 나눌 수 없다
+
+3. a=[1,2,3]
+a[4]
+IndexError: list index out of range #리스트 범위 초과
+
+등 수도없이 다양한 오류 종류가 존재
+'''
+
+#오류 예외 처리 기법
+'''try, except문 기본구조
+try : 
+    수행문
+except [발생오류[as 오류메시지변수]:
+    수행문
+'''
+
+try:
+    4 / 0
+except ZeroDivisionError as e:
+    print(e)
+    
+#division by zero
+
+try:
+    a=[1,2,3]
+    a[4]
+except IndexError as e:
+    print(e)
+    
+#try ... finally
+    #finally절은 try문 수행시, 에러가 나더라도 반드시 수행시키는 명령(강제수행문)
+    
+#ex)
+f = open('foo.txt', 'w')
+try:
+    f.write('123')
+finally:
+    f.close()
+#f.close는 예외 발생여부와 무관하게 항상 수행
+    #보통 finally절은 사용한 리소스를 close 할때 많이 사용
+    
+#여러개의 오류 처리
+'''
+try:
+    ...
+except 발생오류1:
+    ...
+except 발생오류2:
+    ...
+'''
+try:
+    a = [1, 2]
+    print(a[3])
+    4/0
+except ZeroDivisionError:
+    print('0으로 나눌 수 없음')
+except IndexError:
+    print('인덱싱 불가')
+
+#인덱싱 불가    > IndexError가 먼저 발생하여 ZeroDivisionError는 발생하지 않음
+#오류메시지 그대로 가져오기
+try:
+    a = [1, 2]
+    print(a[3])
+    4/0
+except ZeroDivisionError as e:
+    print(e)
+except IndexError as e:
+    print(e)
+
+    #아래처럼 함께 처리할 수도 있음
+try:
+    a = [1, 2]
+    print(a[3])
+    4/0
+except (ZeroDivisionError, IndexError) as e:
+    print(e)
+
+###오류 회피 : 프로그래밍시, 특정 오류 발생해도 그냥 통과시켜야 할 때가 옴
+try:
+    f = open('없는파일', 'r')
+except FileNotFoundError:   #찾는 파일이 없더라도
+    pass                    #pass 시켜라
+
+###오류 발생시키기 : 프로그래밍시, 특정 오류를 발생시키는 경우도 생김
+#부모인 Bird 클래스 > 자식 Eagle 클래스, 반드시 fly 함수를 구현하도록 강제해야 하는 경우
+class Bird:
+    def fly(self):
+        raise NotImplementedError
+
+class Eagle(Bird):
+    pass
+
+eagle = Eagle()
+eagle.fly()     #NotImplementedError
+
+#자식 클래스(Eagle)에서 fly함수를 사용하기 위해 에러를 처리해야함
+    #Eagle 클래스에서 fly를 반드시 구현하게 강제됨
+        #추가)상속받는 클래스에서 함수를 재구현하는것 : 메서드 오버라이딩
+            #추가2) 부모클래스의 메서드를 자식클래스에서 재 정의
+            
+class Eagle(Bird):
+    def fly(self):
+        print('very fast')
+        
+eagle = Eagle()
+eagle.fly()     #very fase
+
+###예외 만들기 : 프로그램 수행중, 특수한 경우에만 예외처리를 하기위해 종종 예외를만들어서 사용함
+class MyError(Exception):
+    pass
+
+def say_nick(nick):
+    if nick == '욕설':
+        raise MyError()
+    print(nick)
+    
+say_nick('천사')    #천사
+say_nick('욕설')    #__main__.MyError
+
+#예외처리 기법으로 MyError 발생 예외처리
+try:
+    say_nick('천사')
+    say_nick('욕설')
+except MyError:
+    print('비속어 사용 금지')
+'''
+천사
+비속어 사용 금지
+'''
+
+#오류메시지를 활용하고 싶은경우 아래처럼 예외만들고 예외처리
+#__str__메서드 : print(e)처럼 오류메시지를 print문으로 출력할 경우 호출되는 메서드
+class MyError(Exception):
+    def __str__(self):
+        return '허용되지 않는 별명입니다.'
+    
+try:
+    say_nick('천사')
+    say_nick('욕설')
+except MyError as e:
+    print(e)
+'''
+천사
+허용되지 않는 별명입니다.
+'''
+
