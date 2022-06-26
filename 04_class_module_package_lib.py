@@ -665,3 +665,197 @@ except MyError as e:
 허용되지 않는 별명입니다.
 '''
 
+#####5-5 내장함수
+abs(3) #절대값 리턴 함수
+
+all([1,2,3])    #반복가능한(iterable) 자료형 중 모두 참이면 True 리턴, 하나라도 거짓이면 False
+    #반복 가능한 자료형 : for문으로 값을 출력할 수 있는 것, 리스트, 튜플, 문자열, 딕셔너리, 집합 등
+all([1,2,3,0])  #False
+
+any([1,2,3])    #하나라도 참이면 True, 모두 거짓이면 False
+
+#dir() : 객체의 자료형이 자체적으로 가지고 있는 변수와 함수를 보여줌
+dir([1,2,3])
+dir({'1':'a'})
+
+divmod(a,b) #a를 b로 나눈 몫과 나머지를 튜플형태로 리턴
+divmod(7,3) #(2, 1)
+
+#enumerate : 열거하는 함수
+    #순서가 있는 자료형(리스트, 튜플 문자열)을 입력받아 인덱스와 함께 리턴
+    
+for i, name in enumerate(['body', 'foo', 'bar']):
+    print(i, name)
+'''
+0 body
+1 foo
+2 bar
+'''
+#for문에 enumerate를 함께 사용시, 자료형의 현재 순서(index)와 그 값을 쉽게 알 수 있음
+    #for문처럼 반복되는 구간에서 객체가 현재 어느 위치에 있는지 알려주는 인덱스 값이 필요할때 유용
+    
+#eval(expression) : 실행가능한 문자열을 입력받아 실행결과값을 리턴
+    #입력받은 문자열로 파이썬 함수나 클래스를 동적으로 실행할때 사용
+eval('1+2')         #3
+eval("'hi'+'a'")    #hia
+eval('divmod(4,3)') #(1,1)
+
+#filter(함수명, 좌측함수로차례로들어갈반복가능한자료형)
+    #두번째 인수 자료형들을 첫번째 인수로 입력해 참인것만 묶어서 리턴
+
+#positive.py
+def positive(l):
+    result = [] #반환값이 참인것만 걸러내 저장할 변수
+    for i in l:
+        if i > 0:
+            result.append(i)    #리스트에 i 추가
+    return result
+
+print(positive([1, -3, 2, 0, -5, 6]))   #[1, 2, 6]
+#위 positive함수는 양수를 걸러내는 함수
+    #filter함수를 쓰면 아래처럼 간단히 구현가능
+    
+#filter1.py
+def positive(x):
+    return x > 0
+
+print(list(filter(positive, [1, -3, 2, 0, -5, 6]))) #[1, 2, 6]
+
+#람다를 쓰면 더 줄일수 있음
+list(filter(lambda x: x>0, [1, -3, 2, 0, -5, 6]))   #[1, 2, 6]
+
+#hex(x) : 16진수 변환
+hex(234)    #'0xea'
+hex(3)  #'0x3'
+
+#id(object) : 객체 고유 주소값(레퍼런스) 리턴
+a = 3
+b = a
+id(3)   #1853368658288
+id(a)   #1853368658288
+id(b)   #1853368658288
+
+#input([prompt]) : 사용자의 입력을 받는 함수
+a = input()
+b = input('Enter : ')
+
+#int(x) : 정수리턴
+int(3.4)    #3
+
+#int(x, radix) : radix진수로 표현된 문자열을 10진수로 변환&리턴
+int('11', 2)    #3
+int('1A', 16)   #26
+
+#isinstance(object, class) : 인스턴스가 그 클래스의 인스턴스면 True, 아니면 False 리턴
+class Person: 
+    pass
+a = Person()            #Person 클래스의 인스턴스 a 생성
+isinstance(a, Person)   #True
+
+b = 3
+isinstance(b, Person)   #False
+
+#len(s) : 입력값(s)의 길이(요소의 전체갯수) 리턴
+len('python')   #6
+len([1,2,3])    #3
+len((1, 'a'))   #2
+
+#list(s) : 반복 가능한 자료형 s를 입력받아 리스트화
+list('python')  #['p', 'y', 't', 'h', 'o', 'n']
+list((1, 2, 3)) #[1, 2, 3]
+
+a = [1, 2, 3]
+b = list(a) #리스트를 리스트화하면, a리스트를 새로 복사하여 새로운 리스트로 만들어줌
+b   #[1, 2, 3]  #id(a) != id(b)
+
+#map(f, iterable) : 함수(f)와 반복가능한(iterable) 자료형을 입력받음
+    #입력받은 자료형의 각 요소를 함수 f로 수행한 결과를 묶어서 돌려받음
+#two_times.py
+def two_times(numberList):  #2곱한 값 리턴
+    result = []
+    for number in numberList:
+        result.append(number*2)
+    return result
+
+result = two_times([1, 2, 3, 4])
+print(result)   #[2, 4, 6, 8]
+
+#위 함수를 map을 사용하면
+def two_times(x):
+    return x*2
+
+list(map(two_times, [1, 2, 3, 4]))  #[2, 4, 6, 8]
+
+#람다를 사용하면
+list(map(lambda a: a*2, [1, 2, 3, 4]))  #[2, 4, 6, 8]
+
+#max(iterable) : 최대값 리턴
+max([1, 2, 3])  #3
+max('python')   #y
+
+#min(iterable) : 최소값 리턴
+min([1, 2, 3])  #1
+min('python')   #h
+
+#oct(x) : 8진수 변환
+oct(34) #'0o42'
+oct(12345) #'0o30071'
+
+#open(파일명, [파일모드]) : 파일 열기, 파일모드 기본값 = 'r'
+    #파일모드 : 'w', 'r', 'a', 'b'  #'b' : 바이너리 모드로 파일열기(w,r,a와 함께 사용)
+f = open('binary_file', 'rb')
+
+#ord(c) : 문자의 아스키 코드값 리턴 <> chr 함수와 반대기능
+ord('a')    #97
+ord('0')    #48
+
+#pow(x, y)  #x의 y제곱값 리턴
+pow(2, 4)   #16
+pow(3, 3)   #27
+
+#range([start,] stop [, step]) : 입력받은 숫자 범위, 반복 가능한 객체로 리턴
+#인수가 하나인 경우
+list(range(5))  #0부터 4까지    [0, 1, 2, 3, 4]
+
+#인수가 2개일때
+list(range(5, 10))  #5부터 9까지    [5, 6, 7, 8, 9]
+
+#인수 3개
+list(range(1, 10, 2))#1부터 10까지, 2step   [1, 3, 5, 7, 9]
+list(range(0, -10, -1))#1부터 10까지, 2step   [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
+
+#round(number[, ndigits]) : 반올림
+round(4.6)  #5
+round(4.2)  #4
+round(5.678, 2)  #ndigits : 소숫점 이하 자릿수
+
+#sorted(iterable) : 입력값 정렬 후 리턴
+sorted([3, 1, 2])   #[1, 2, 3]
+    #리스트 자료형 sort함수도 있지만, 이 함수는 리스트 객체 그 자체만 정렬할뿐, 리턴은 돌려주지 않음
+    
+#str(object) : 문자열 변환 리턴
+str(3)  #'3'
+str('hi')   #'hi'
+str('hi'.upper())   #'HI'
+
+#sum(iterable) : 입력받은 리스트나 튜플 요소의 합 리턴
+sum([1, 2, 3])  #6
+sum((4, 5, 6))  #15
+
+#tuple(iterable) : 반복 가능 자료형 튜플형태로 리턴
+tuple('abc')        #('a', 'b', 'c')
+tuple([1, 2, 3])    #(1, 2, 3)
+tuple((1, 2, 3))    #(1, 2, 3)
+
+#type(object) : 입력한 object의 자료형 리턴
+type('abc') #<class 'str'>
+type([])    #<class 'list'>
+type(open('test', 'w')) #<class '_io.TextIOWrapper'>
+
+#zip(*iterable) : 동일한 개수로 이루어진 자료형을 묶어줌
+    #*iterable : 반복 가능한 자료형 여러개를 입력할 수 있다는 의미
+    
+list(zip([1, 2, 3], [4, 5, 6])) #[(1, 4), (2, 5), (3, 6)]
+
+list(zip([1, 2, 3], [4, 5, 6], [7, 8, 9]))  #[(1, 4, 7), (2, 5, 8), (3, 6, 9)]
+list(zip('abc', 'def')) #[('a', 'd'), ('b', 'e'), ('c', 'f')]
