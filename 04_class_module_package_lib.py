@@ -859,3 +859,415 @@ list(zip([1, 2, 3], [4, 5, 6])) #[(1, 4), (2, 5), (3, 6)]
 
 list(zip([1, 2, 3], [4, 5, 6], [7, 8, 9]))  #[(1, 4, 7), (2, 5, 8), (3, 6, 9)]
 list(zip('abc', 'def')) #[('a', 'd'), ('b', 'e'), ('c', 'f')]
+
+####5-6 라이브러리
+###sys : 파이썬 인터프리터가 제공하는 변수와 함수를 직접 제어할 수 있게 해주는 모듈
+
+##sys.argv : 명령행에서 인수 전달
+#C:/User/home>python test.py abc pey guido
+
+#C:\doit\Mymod 디렉토리에 argv_test.py 저장
+#argv_test.py
+import sys
+print(sys.argv)
+
+#C:\doit\Mymod>python argv_test.py you need python
+#['argv_test.py', 'you', 'need', 'python']
+    #공백 기준으로 python 뒤 모든 요소가 sys.argv 리스트의 요소가 됨
+    
+##sys.exit : 강제 스크립트 종료
+sys.exit()  #Ctrl+z, Ctrl+D처럼 인터프린터 종료하는 역할
+
+##sys.path : 모듈 경로지정
+import sys
+sys.path
+
+#path_append.py
+import sys
+sys.path.append('.py모듈지정할경로')
+#sys.path.append(r'C:\doit\Mymod')
+
+###pickle : 객체의 형태를 그대로 유지하면서, 파일에 저장하고 불러올 수 있게 하는 모듈
+import pickle
+f = open('test.txt', 'wb')
+data = {1: 'python', 2: 'you need'}
+pickle.dump(data, f)
+f.close()
+
+import pickle
+f = open('test.txt', 'rb')
+data = pickle.load(f)
+print(data)
+#{1: 'python', 2: 'you need'}
+f.close()
+
+###os : 환경변수, 디렉토리, 파일 등 os자원을 제어 모듈
+
+##os.environ : 내 시스템 환경 변수 값 알고싶을때
+import os
+os.environ          #내 환경정보 딕셔너리 형태로 제공
+os.environ['PATH']  #PATH의 Value 조회
+
+##os.chdir('경로') : 디렉토리 위치 변경
+os.chdir(r'C:\WINDOWS')
+
+##os.getcwd() : 현재 디렉토리 위치 리턴
+os.getcwd()
+
+##os.system('명령어') : 시스템 명령어 호출
+os.system('dir')
+
+##os.popen('명령어') : 시스템 명령어 실행한 결과값, 읽기 모드형태 파일객체로 리턴
+f = os.popen('dir')
+print(f.read())
+
+'''기타 유용한 os 관련 함수
+os.mkdir(디렉토리) : 디렉토리 생성
+os.rmdir(디렉토리) : 디렉토리 삭제_디렉토리 비어있어야 가능
+os.unlink(파일명) : 파일 삭제
+os.rename(scr, dst) : src라는 파일명을 dst라는 이름으로 변경
+'''
+
+###shutil : 파일 복사 모듈
+import shutil
+shutil.copy('src.txt', 'dst.txt')   #src.txt가 복사 > dst.txt이름으로 저장
+
+###glob : 특정 디렉토리 내, 파일명 전체 리턴
+##glob(pathname) : 디렉토리 내 파일들 리스트화
+import glob
+glob.glob(r'C:\doit\mark*') #C, doit폴더 mark로 시작하는 모든폴더명 리스트화
+
+###tempfile : 파일 임시 생성 모듈
+##tempfile.mkstemp() : 중복되지 않는 임시파일의 이름 무작위 생성 및 리턴
+import tempfile
+filename = tempfile.mkstemp()
+filename    #(3, 'C:\\Users\\Mok\\AppData\\Local\\Temp\\tmpebe450wl')
+
+##tempfile.TemporaryFile() : 임시저장공간으로 사용할 파일 객체 리턴
+import tempfile
+f = tempfile.TemporaryFile()    #기본적으로 wb(바이너리 쓰기모드) 생성
+f.close()                       #close하면 임시생성파일 자동 삭제됨
+
+###time : 시간 관련 모듈
+##time.time() : UTC 1970년 1월 1일 기준, 지난 시간을 초단위로 리턴
+import time
+time.time() #1656309432.4520116
+
+#time.localtime() : time.time()으로 받은 현재시간 값을 년,월,일,시,분,초로 쪼개 튜플로 리턴
+time.localtime(time.time())
+#time.struct_time(tm_year=2022, tm_mon=6, tm_mday=27, tm_hour=14, tm_min=58, tm_sec=31, tm_wday=0, tm_yday=178, tm_isdst=0)
+
+##time.asctime() : time.localtime 리턴값을 받아 날짜와 시간 형태로 리턴
+time.asctime(time.localtime(time.time()))   #'Mon Jun 27 15:00:19 2022'
+
+##time.ctime
+time.ctime()    #위 내용을 간단히 만든 함수, 현재시간만을 리턴함
+
+##time.strftime('출력할형식포맷코드', time.localtime(time.time()))
+'''strftime : 시간관련 여러 포맷코드 제공
+포맷코드    설명            예시
+%a          요일 줄임말     Mon
+%A          요일            Monday
+%b          달 줄임말       Jan
+%B          달              January
+%c          날짜와 시간출력 'Mon Jun 27 15:09:34 2022'
+%d          날(day)         [01,31]
+%H          시간(hour):24H  [00,23]
+%I          시간(hout):12H  [01,12]
+%j          1년중누적날짜   [001,366]
+%m          달              [01,12]
+%M          분              [01,59]
+%p          AM or PM        AM
+%S          초              [00,59]
+%U          1년중누적주     [00,53]     일요일 시작 기준
+%w          숫자로 된 요일  [0(일요일),6]
+%W          1년중누적주     [00,53]     월요일 시작 기준
+%x          날짜출력        [06/01/01]  현재 설정지역 기반
+%X          시간출력        [17:22:21]  현재 설정지역 기반
+%Y          연도 출력       2001
+%Z          시간대출력      대한민국 표준시
+%%          문자            %
+%y          두자리연도출력   01
+'''
+#time.strftime 사용 예시
+import time
+time.strftime('%x', time.localtime(time.time()))    #'06/27/22'
+time.strftime('%c', time.localtime(time.time()))    #'Mon Jun 27 15:09:34 2022'
+
+##time.sleep(초) : 루프에 일정시간간격 텀 주기
+#sleep1.py
+import time
+for i in range(10):
+    print(i)
+    time.sleep(1)
+    
+###calendar : 달력 모듈
+##calendar.calendar(연도) : 그해 전체 달력
+import calendar
+print(calendar.calendar(2022))
+
+##calendar.prcal(연도)도 위와 동일한 결과
+calendar.prcal(2022)
+
+'''
+                                  2022
+
+      January                   February                   March
+Mo Tu We Th Fr Sa Su      Mo Tu We Th Fr Sa Su      Mo Tu We Th Fr Sa Su
+                1  2          1  2  3  4  5  6          1  2  3  4  5  6
+ 3  4  5  6  7  8  9       7  8  9 10 11 12 13       7  8  9 10 11 12 13
+10 11 12 13 14 15 16      14 15 16 17 18 19 20      14 15 16 17 18 19 20
+17 18 19 20 21 22 23      21 22 23 24 25 26 27      21 22 23 24 25 26 27
+24 25 26 27 28 29 30      28                        28 29 30 31
+31
+
+       April                      May                       June
+Mo Tu We Th Fr Sa Su      Mo Tu We Th Fr Sa Su      Mo Tu We Th Fr Sa Su
+             1  2  3                         1             1  2  3  4  5
+ 4  5  6  7  8  9 10       2  3  4  5  6  7  8       6  7  8  9 10 11 12
+11 12 13 14 15 16 17       9 10 11 12 13 14 15      13 14 15 16 17 18 19
+18 19 20 21 22 23 24      16 17 18 19 20 21 22      20 21 22 23 24 25 26
+25 26 27 28 29 30         23 24 25 26 27 28 29      27 28 29 30
+                          30 31
+
+        July                     August                  September
+Mo Tu We Th Fr Sa Su      Mo Tu We Th Fr Sa Su      Mo Tu We Th Fr Sa Su
+             1  2  3       1  2  3  4  5  6  7                1  2  3  4
+ 4  5  6  7  8  9 10       8  9 10 11 12 13 14       5  6  7  8  9 10 11
+11 12 13 14 15 16 17      15 16 17 18 19 20 21      12 13 14 15 16 17 18
+18 19 20 21 22 23 24      22 23 24 25 26 27 28      19 20 21 22 23 24 25
+25 26 27 28 29 30 31      29 30 31                  26 27 28 29 30
+
+      October                   November                  December
+Mo Tu We Th Fr Sa Su      Mo Tu We Th Fr Sa Su      Mo Tu We Th Fr Sa Su
+                1  2          1  2  3  4  5  6                1  2  3  4
+ 3  4  5  6  7  8  9       7  8  9 10 11 12 13       5  6  7  8  9 10 11
+10 11 12 13 14 15 16      14 15 16 17 18 19 20      12 13 14 15 16 17 18
+17 18 19 20 21 22 23      21 22 23 24 25 26 27      19 20 21 22 23 24 25
+24 25 26 27 28 29 30      28 29 30                  26 27 28 29 30 31
+31
+'''
+
+##calendar.prmonth(년도, 월) : 특정년도 특정월 달력출력
+calendar.prmonth(2022, 7)
+'''
+     July 2022
+Mo Tu We Th Fr Sa Su
+             1  2  3
+ 4  5  6  7  8  9 10
+11 12 13 14 15 16 17
+18 19 20 21 22 23 24
+25 26 27 28 29 30 31
+'''
+
+#calendar.weekday(연도, 월, 일) : 해당일자 요일정보 리턴 / 0:월, 1:화, ... 6:일
+calendar.weekday(2022, 6, 27)
+
+##calendar.monthrange(연도, 월) : 해당 월의 1일이 무슨요일인지 & 며칠까지 있는지 리턴
+calendar.monthrange(2022, 7)    #(4, 31) 2022년 7월 1일은 금(4)요일, 7월은 31일까지 있음
+
+    #.weekday와 .monthrange는 프로그래밍에 매우 유용하게 활용되니 참고
+
+###random : 난수 발생 모듈
+import random
+random.random() #0.17959364435064484    0.0~1.0 실수값 난수 리턴
+
+random.randint(1, 10)   #6              1~10 정수값 난수 리턴
+random.randint(1, 55)   #49             1~55 정수값 난수 리턴
+
+#random_pop.py : 데이터 랜덤 추출
+import random
+def random_pop(data):
+    number = random.randint(0, len(data)-1)
+    return data.pop(number)
+
+if __name__ == '__main__':
+    data = [1, 2, 3, 4, 5]
+    while data: print(random_pop(data))
+
+#random_pop은 아래처럼 조금 더 직관적으로도 만들 수 있음
+def random_pop(data):
+    number = random.choice(data)
+    data.remove(number)
+    return number
+
+import random
+data = [1, 2, 3, 4, 5]
+random.shuffle(data)    #리스트 무작위 섞기
+data
+
+###webbrowser : 기본브라우저로 url 새창 작동
+import webbrowser
+webbrowser.open('http://google.com')
+webbrowser.open_new('http://google.com')
+
+###threading : 스레드를 다루는 모듈
+    #컴퓨터 동작 프로그램을 프로세스(Process)라고 함
+        #보통 1개의 프로세스는 한가지 일만 할 수 있음
+            #쓰레드를 사용하면 한 프로세스 내에서 2가지 이상의 일을 동시 수행할 수 있음
+            
+#thread_test.py
+import time
+
+def long_task():    #0~4를 반복 출력
+    for i in range(5):
+        time.sleep(1)
+        print(f'working:{i}\n')
+        
+print('start')
+for i in range(5):  #위 작업을 5번 돌림 > 총 25초 소요
+    long_task()
+    
+print('End')
+
+#thread_test.py (수정)
+import time
+import threading    #쓰레드 생성 위해 threading 모듈 사용
+
+def long_task():
+    for i in range(5):
+        time.sleep(1)
+        print(f'working:{i}\n')
+print('Start')
+
+threads = []
+for i in range(5):
+    t = threading.Thread(target=long_task)  #쓰레드 생성
+    threads.append(t)
+    
+for t in threads:   #쓰레드 실행
+    t.start()
+    
+print('End')
+#쓰레드 5개가 동시 작업되어 작업시간은 5초로 단축되었으나, start동작 후 end가 먼저나옴
+    #프로그램 정상작동 아니니 다시한번 수정해보자
+    
+#threat_test.py(수정2)
+import time
+import threading
+
+def long_task():
+    for i in range(5):
+        time.sleep(1)
+        print(f'working:{i}\n')
+
+print('Start')
+
+threads = []
+for i in range(5):
+    t = threading.Thread(target=long_task)
+    threads.append(t)
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()        #join으로 쓰레드 종료시 까지 대기
+    
+print('End')
+
+#쓰레드 join함수는 해당 스레드가 종료될때까지 기다리게 함
+    #우리가 원하는 결과인지 확인 해보자
+    
+#####연습문제
+#q1
+class Calculator:
+    def __init__(self):
+        self.value = 0
+    
+    def add(self, val):
+        self.value += val
+        
+cal = UpgradeCalculator()
+cal.add(10)
+cal.minus(7)
+
+print(cal.value)    #10-7이 되도록 UpgrageCalculator 클래스 정의해볼것
+
+class UpgradeCalculator(Calculator):
+    def minus(self, val):
+        self.value -= val
+
+#q2
+cal = MaxLimitCalculator()
+cal.add(50)
+cal.add(60)
+
+print(cal.value)    #100출력
+
+class MaxLimitCalculator(Calculator):
+    def add(self, val):
+        self.value += val
+        if self.value > 100 : self.value = 100
+
+#q3
+all([1, 2, abs(-3)-3])  #False  all : 모두 참이면 Trye, 하나라도 거짓이면 False
+chr(ord('a')) == 'a'    #True   chr 아스키 > 문자 / ord 문자 > 아스키코드
+
+#4 filter와 lambda를 사용, [1, -2, 3, -5, 8, -3] 음수 모두 제거
+list(filter(lambda x: x>0, [1, -2, 3, -5, 8, -3]))
+
+#5
+hex(234)    #'0xea'
+int('0xea', 16) #234
+
+#6
+list(map(lambda x: x*3, [1, 2, 3, 4]))  #[3, 6, 9, 12]
+
+#7
+a = [-8, 2, 7, 5, -3, 5, 0, 1]
+max(a) + min(a)
+
+#8
+17/3
+round(17/3, 4)
+
+#9 모르겠는데?
+'''
+C:\>cd doit
+C:\doit>python myargv.py 1 2 3 4 5 6 7 8 9 10
+'''
+import sys
+numbers = sys.argv[1:]  #파일 이름을 제외한 명령 행의 모든 입력
+
+result = 0
+for number in numbers:
+    result += int(number)
+print(result)
+
+
+#10
+import os
+os.getcwd()
+os.chdir(r'C:\doit')
+
+result = os.popen('dir')
+print(result.read())
+
+#q11
+import glob
+glob.glob(r'C:\doit\*.py')
+
+#q12
+import time
+time.strftime('%Y/%m/%d %H:%M:%S')  #'2022/06/27 16:41:48'
+#time.strftime('%c', time.localtime(time.time()))   #'Mon Jun 27 16:41:56 2022'
+
+#q13
+import random
+
+result = []
+while len(result) < 6:
+    num = random.randint(1, 45)
+    if num not in result:
+        result.append(num)
+print(result)
+
+'''
+lotto = list(range(1, 46))
+lotto_list = []
+for i in range(6):
+    a = random.choice(lotto)
+    lotto_list.append(a)
+    lotto.remove(a)
+    
+print(lotto_list)
+'''
