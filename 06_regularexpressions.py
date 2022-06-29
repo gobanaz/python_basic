@@ -24,10 +24,7 @@ for line in data.split('\n'):   #줄바꿈 기준 split
 print('\n'.join(result))    #줄바꿈 기준 split 원복
 
 #정규표현식으로 하면 아래와같이 구현가능
-from calendar import c
 import re
-
-from pyrsistent import b
 
 data = '''
 park 800905-1049118
@@ -207,7 +204,7 @@ for r in result:
 메서드      목적
 group()     매치된 문자열을 리턴
 start()     매치된 문자열의 시작인덱스 리턴
-end()       매치된 문자열의 끝인덱스 리턴
+end()       매치된 문자열의 끝인덱스+1 리턴
 span()      매치된 문자열의 (시작, 끝) 인덱스 튜플형태로 리턴
 '''
 
